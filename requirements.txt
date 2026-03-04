@@ -1,20 +1,20 @@
-# CorridorKey – ComfyUI custom node dependencies
-# NOTE: torch & torchvision are NOT listed here on purpose.
-# ComfyUI already ships its own CUDA-optimised PyTorch build;
-# re-declaring them here would force pip to overwrite it.
-
-# Core inference
-timm>=0.9               # Hiera backbone (hiera_base_plus_224) + features_only support
-numpy
-opencv-python>=4.0      # cv2.connectedComponentsWithStats requires OpenCV 3+; 4.x is the modern line
+# Runtime dependencies for ComfyUI-CorridorKey
+# ComfyUI ships its own torch build; listing it here with a soft lower bound
+# lets dependency installers verify it is present without overwriting it.
+torch>=2.0
+torchvision>=0.15
+timm>=1.0.24,<2.0
+numpy>=1.24
+opencv-python>=4.8
+Pillow>=9.5
 tqdm
 
-# GVM alpha-hint generator (optional at runtime, but needed if user picks GVM)
+# Optional – only needed if using GVM or VideoMaMa alpha generators.
+# Uncomment if you plan to use alpha_generator modes other than "None".
 diffusers
 transformers
 accelerate
 peft
 safetensors
 einops
-Pillow
 huggingface-hub
