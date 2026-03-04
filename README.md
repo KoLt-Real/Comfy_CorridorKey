@@ -4,7 +4,7 @@
 
 **Installation:**
 1. Clone or download this repository directly into your `ComfyUI/custom_nodes/` directory. Ensure the folder is named `CorridorKey`.
-2. Make sure you install the required dependencies in your ComfyUI python environment, see the Installation section below.
+2. Make sure you install the required dependencies in your ComfyUI python environment, see the Installation section below. (e.g. `pip install -r requirements.txt` or via `uv sync` depending on your setup).
 3. The node automatically handles downloading the foundational model weights for you upon its first generation!
 
 **Node Inputs & Parameters:**
