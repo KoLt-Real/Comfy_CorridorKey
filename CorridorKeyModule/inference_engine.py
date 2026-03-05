@@ -217,7 +217,7 @@ class CorridorKeyEngine:
         comp_srgb = cu.linear_to_srgb(comp_lin)
 
         return {
-            "alpha": res_alpha,  # Linear, Raw Prediction
+            "alpha": processed_alpha,  # Linear, Cleaned Prediction (if despeckled)
             "fg": res_fg,  # sRGB, Raw Prediction (Straight)
             "comp": comp_srgb,  # sRGB, Composite
             "processed": processed_rgba,  # Linear/Premul, RGBA, Garbage Matted & Despilled

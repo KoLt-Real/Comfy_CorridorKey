@@ -1,13 +1,16 @@
 # Runtime dependencies for ComfyUI-CorridorKey
 # ComfyUI ships its own torch build; listing it here with a soft lower bound
 # lets dependency installers verify it is present without overwriting it.
+torch>=2.0
+torchvision>=0.15
 timm>=1.0.24,<2.0
 numpy>=1.24
 opencv-python>=4.8
 Pillow>=9.5
 tqdm
 
-# Only needed if using GVM or VideoMaMa alpha generators.
+# Optional – only needed if using GVM or VideoMaMa alpha generators.
+# Uncomment if you plan to use alpha_generator modes other than "None".
 diffusers
 transformers
 accelerate

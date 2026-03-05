@@ -1,30 +1,3 @@
-# ComfyUI Custom Node
-
-**Original Repository:** [https://github.com/nikopueringer/CorridorKey](https://github.com/nikopueringer/CorridorKey)
-
-**Installation:**
-1. Clone or download this repository directly into your `ComfyUI/custom_nodes/` directory.
-2. Make sure you install the required dependencies in your ComfyUI python environment, see the Installation section below. (e.g. `pip install -r requirements.txt` or via `uv sync` depending on your setup).
-3. The node automatically handles downloading the foundational model weights for you upon its first generation!
-
-**Node Inputs & Parameters:**
-*   **images (IMAGE):** The input raw green screen footage sequence.
-*   **alpha_hint (MASK):** (Optional/Required) A coarse roto/mask hint. It is **required** if `alpha_generator` is set to `None` or `VideoMaMa (from mask)`.
-*   **alpha_generator:** 
-    *   **`None`:** Uses the `alpha_hint` mask exactly as you wired it.
-    *   **`GVM (Auto)`:** Completely auto-generates a high quality Alpha Hint mask from your image sequence using GVM. *Auto-downloads GVM weights (80GB+).*
-    *   **`VideoMaMa (from mask)`:** Uses VideoMaMa to temporally refine the rough `alpha_hint` mask you provide before processing. *Auto-downloads VideoMaMa weights.*
-*   **device:** `cuda`, `cpu`, or `mps`.
-*   **use_refiner:** Enables the high-frequency detail refiner inside the neural network architecture (Default: `True`).
-*   **input_is_linear:** Toggle this to `True` if your input sequence is in linear color space. If it is standard sRGB/Rec709 video, leave as `False`.
-*   **despill_strength:** Standard green screen despill suppression baked into the output foreground (0.0 to 1.0).
-*   **auto_despeckle & despeckle_size:** Mathematically removes tiny, disconnected specks/noise from the predicted matte.
-*   **verbose:** `True` streams progress and informative outputs directly to your ComfyUI terminal (and a visual progress bar).
-
-**Node Outputs:**
-*   **mask (MASK):** The final, high-fidelity unmixed linear Alpha Matte.
-*   **composite (IMAGE):** The pre-multiplied foreground composited over a dark grey checkerboard. This is incredibly useful for connecting to a `PreviewImage` node to see what the key extraction actually looks like before rendering.
-
 # CorridorKey
 
 
@@ -131,6 +104,35 @@ For the easiest experience, use the provided launcher scripts. These scripts lau
     *   `/FG`: The raw Straight Foreground Color Object. (Note: The engine natively computes this in the sRGB gamut. You must manually convert this pass to linear gamma before being combined with the alpha in your compositing program).
     *   `/Processed`: An RGBA image containing the Linear Foreground premultiplied against the Linear Alpha (EXR). This pass exists so you can immediately drop the footage into Premiere/Resolve for a quick preview without dealing with complex premultiplication routing. However, if you want more control over your image, working with the raw FG and Matte outputs will give you that.
     *   `/Comp`: A simple preview of the key composited over a checkerboard (PNG).
+
+### 4. Usage: ComfyUI Custom Node
+
+This repository can also be used directly as a **Custom Node** in ComfyUI! You do not need to use the command-line wizard if you prefer a node-based workflow.
+
+**Original Repository:** [https://github.com/nikopueringer/CorridorKey](https://github.com/nikopueringer/CorridorKey)
+
+**Installation:**
+1. Clone or download this repository directly into your `ComfyUI/custom_nodes/` directory. Ensure the folder is named `CorridorKey`.
+2. Make sure you install the required dependencies in your ComfyUI python environment (e.g. `pip install -r requirements.txt` or via `uv sync` depending on your setup).
+3. The node automatically handles downloading the foundational model weights for you upon its first generation!
+
+**Node Inputs & Parameters:**
+*   **images (IMAGE):** The input raw green screen footage sequence.
+*   **alpha_hint (MASK):** (Optional/Required) A coarse roto/mask hint. It is **required** if `alpha_generator` is set to `None` or `VideoMaMa (from mask)`.
+*   **alpha_generator:** 
+    *   **`None`:** Uses the `alpha_hint` mask exactly as you wired it.
+    *   **`GVM (Auto)`:** Completely auto-generates a high quality Alpha Hint mask from your image sequence using GVM. *Auto-downloads GVM weights (80GB+).*
+    *   **`VideoMaMa (from mask)`:** Uses VideoMaMa to temporally refine the rough `alpha_hint` mask you provide before processing. *Auto-downloads VideoMaMa weights.*
+*   **device:** `cuda`, `cpu`, or `mps`.
+*   **use_refiner:** Enables the high-frequency detail refiner inside the neural network architecture (Default: `True`).
+*   **input_is_linear:** Toggle this to `True` if your input sequence is in linear color space. If it is standard sRGB/Rec709 video, leave as `False`.
+*   **despill_strength:** Standard green screen despill suppression baked into the output foreground (0.0 to 1.0).
+*   **auto_despeckle & despeckle_size:** Mathematically removes tiny, disconnected specks/noise from the predicted matte.
+*   **verbose:** `True` streams progress and informative outputs directly to your ComfyUI terminal (and a visual progress bar).
+
+**Node Outputs:**
+*   **mask (MASK):** The final, high-fidelity unmixed linear Alpha Matte.
+*   **composite (IMAGE):** The pre-multiplied foreground composited over a dark grey checkerboard. This is incredibly useful for connecting to a `PreviewImage` node to see what the key extraction actually looks like before rendering.
 
 ## But What About Training and Datasets?
 
