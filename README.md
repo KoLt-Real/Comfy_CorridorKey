@@ -1,12 +1,10 @@
 # ComfyUI Custom Node
 
-This repository can also be used directly as a **Custom Node** in ComfyUI! You do not need to use the command-line wizard if you prefer a node-based workflow.
-
 **Original Repository:** [https://github.com/nikopueringer/CorridorKey](https://github.com/nikopueringer/CorridorKey)
 
 **Installation:**
-1. Clone or download this repository directly into your `ComfyUI/custom_nodes/` directory. Ensure the folder is named `CorridorKey`.
-2. Make sure you install the required dependencies in your ComfyUI python environment (e.g. `pip install -r requirements.txt` or via `uv sync` depending on your setup).
+1. Clone or download this repository directly into your `ComfyUI/custom_nodes/` directory.
+2. Make sure you install the required dependencies in your ComfyUI python environment (e.g. `pip install -r requirements.txt`).
 3. The node automatically handles downloading the foundational model weights for you upon its first generation!
 
 **Node Inputs & Parameters:**
