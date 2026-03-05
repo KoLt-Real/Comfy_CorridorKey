@@ -10,7 +10,7 @@ Pillow>=9.5
 tqdm
 
 # Optional – only needed if using GVM or VideoMaMa alpha generators.
-# Uncomment if you plan to use alpha_generator modes other than "None".
+
 diffusers
 transformers
 accelerate
