@@ -74,10 +74,11 @@ class CorridorKeyNode:
                     raise ImportError(f"[CorridorKey] Failed to import GVM. Ensure you ran 'uv sync' or installed the requirements from gvm_core. Error: {e}")
                 
                 # Auto-download GVM weights if missing
+                # Check for vae/config.json (model_index.json does not exist in geyongtao/gvm)
                 gvm_weights = os.path.join(gvm_dir, "weights")
                 os.makedirs(gvm_weights, exist_ok=True)
-                if not os.path.exists(os.path.join(gvm_weights, "model_index.json")):
-                    if verbose: print("[CorridorKey] GVM Model (80GB+) not found locally. Auto-downloading from HuggingFace... (This may take a very long time)")
+                if not os.path.exists(os.path.join(gvm_weights, "vae", "config.json")):
+                    if verbose: print("[CorridorKey] GVM weights not found locally. Auto-downloading from HuggingFace (this may take a while)...")
                     try:
                         from huggingface_hub import snapshot_download
                         snapshot_download(repo_id="geyongtao/gvm", local_dir=gvm_weights)
@@ -141,16 +142,42 @@ class CorridorKeyNode:
             
             vmm_chk_path = os.path.join(vmm_path, "checkpoints")
             os.makedirs(vmm_chk_path, exist_ok=True)
-            if not os.path.exists(os.path.join(vmm_chk_path, "VideoMaMa", "diffusion_pytorch_model.safetensors")):
-                if verbose: print("[CorridorKey] VideoMaMa Model not found locally. Auto-downloading from HuggingFace...")
+
+            # Download the fine-tuned VideoMaMa UNet (SammyLim/VideoMaMa).
+            # Files go into checkpoints/VideoMaMa/ so pipeline can find unet/ subfolder there.
+            vmm_model_dir = os.path.join(vmm_chk_path, "VideoMaMa")
+            vmm_unet_sentinel = os.path.join(vmm_model_dir, "unet", "diffusion_pytorch_model.safetensors")
+            if not os.path.exists(vmm_unet_sentinel):
+                if verbose: print("[CorridorKey] VideoMaMa UNet not found locally. Auto-downloading from HuggingFace (SammyLim/VideoMaMa)...")
                 try:
                     from huggingface_hub import snapshot_download
-                    snapshot_download(repo_id="SammyLim/VideoMaMa", local_dir=vmm_chk_path)
+                    os.makedirs(vmm_model_dir, exist_ok=True)
+                    snapshot_download(repo_id="SammyLim/VideoMaMa", local_dir=vmm_model_dir)
                 except Exception as e:
-                    print(f"[CorridorKey Error] VideoMaMa weights download failed: {e}")
-            
-            base_m = os.path.join(vmm_chk_path, "stable-video-diffusion-img2vid-xt")
-            unet_m = os.path.join(vmm_chk_path, "VideoMaMa")
+                    print(f"[CorridorKey Error] VideoMaMa UNet download failed: {e}")
+
+            # Download only the required parts of the SVD base model (~2.5GB).
+            # The UNet from SVD is NOT needed — VideoMaMa replaces it with its own.
+            # Only feature_extractor, image_encoder, vae, and model_index.json are used.
+            svd_dir = os.path.join(vmm_chk_path, "stable-video-diffusion-img2vid-xt")
+            svd_sentinel = os.path.join(svd_dir, "model_index.json")
+            if not os.path.exists(svd_sentinel):
+                if verbose: print("[CorridorKey] SVD base components not found locally. Auto-downloading from HuggingFace (~2.5GB, VAE + image encoder only)...")
+                try:
+                    from huggingface_hub import snapshot_download
+                    os.makedirs(svd_dir, exist_ok=True)
+                    snapshot_download(
+                        repo_id="stabilityai/stable-video-diffusion-img2vid-xt",
+                        local_dir=svd_dir,
+                        allow_patterns=["feature_extractor/*", "image_encoder/*", "vae/*", "model_index.json"],
+                    )
+                except Exception as e:
+                    print(f"[CorridorKey Error] SVD base model download failed: {e}")
+
+            # base_m  = .../checkpoints/stable-video-diffusion-img2vid-xt
+            # unet_m  = .../checkpoints/VideoMaMa  (contains unet/ subfolder)
+            base_m = svd_dir
+            unet_m = vmm_model_dir
             
             pipeline = load_videomama_model(base_model_path=base_m, unet_checkpoint_path=unet_m, device=device)
             gen = run_inference(pipeline, input_frames, mask_frames, chunk_size=24)
